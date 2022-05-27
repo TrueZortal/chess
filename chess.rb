@@ -131,7 +131,6 @@ class Rook
 
   def move(chess_position_notation)
     target_position = calculate_requested_position(chess_position_notation)
-    p target_position
     raise InvalidMoveError unless valid_moves.include?(target_position)
 
     @position = target_position
@@ -182,7 +181,3 @@ class Rook
     @colour == 'black'
   end
 end
-
-rook = Rook.new('black', 0, 0)
-    rook.move('h1')
-    p rook.position
