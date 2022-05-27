@@ -59,31 +59,31 @@ class ChessTest < Minitest::Test
   end
 
   def test_rook_starting_position_is_valid
-    skip
+    # skip
     assert_raises(ArgumentError) do
       Rook.new('white', 2, -2)
     end
   end
 
   def test_rook_can_only_be_black_or_white
-    skip
+    # skip
     assert_raises(ArgumentError) do
       Rook.new('potato', 2, -2)
     end
   end
 
   def test_rook_can_move_diagonal
-    skip
-    rook = Rook.new('black', 0, 0)
-    rook.move('a8')
-    asser_equal [0,7], rook.position
+    # skip
+    rook = Rook.new('black', 2, 2)
+    rook.move('C8')
+    assert_equal [2,7], rook.position
   end
 
   def test_rook_can_move_horizontal
     skip
     rook = Rook.new('black', 0, 0)
     rook.move('h1')
-    asser_equal [7,0], rook.position
+    assert_equal [7,0], rook.position
   end
 
   def rook_cant_move_across

@@ -106,45 +106,78 @@ class Pawn
   end
 end
 
-# class Rook
-#   attr_accessor :position
-#   attr_reader :colour, :attacking_fields
+class Rook
+  attr_accessor :position
+  attr_reader :colour, :attacking_fields, :symbol
 
-#   def initialize(colour,x,y)
-#     raise ArgumentError if valid_position_coordinates(x, y) || valid_colour(colour)
+  @@board = {
+    'a' => 0,
+    'b' => 1,
+    'c' => 2,
+    'd' => 3,
+    'e' => 4,
+    'f' => 5,
+    'g' => 6,
+    'h' => 7
+  }
 
-#     @colour = colour.downcase
-#     @position = [x, y]
-#     locate_attacking_fields
-#   end
+  def initialize(colour, x, y)
+    raise ArgumentError unless valid_colour(colour.downcase) && valid_position_coordinates(x, y)
 
-#   def move
-#   end
+    @symbol = 'R'
+    @colour = colour.downcase
+    @position = [x, y]
+  end
 
-#   private
+  def move(chess_position_notation)
+    target_position = calculate_requested_position(chess_position_notation)
+    raise InvalidMoveError unless valid_moves.include?(target_position)
 
-#   def locate_attacking_fields
-#     if is_white
-#       @attacking_fields =
-#     elsif is_black
-#       @attacking_fields =
-#     end
-#   end
+    @position = target_position
+  end
 
-#   def valid_position_coordinates(x, y)
-#     x > 8 || x < 1 || y < 1 || y > 8
-#   end
+  private
 
-#   def valid_colour(colour)
-#     colours = ['white', 'black']
-#     !colours.include?(colour.downcase)
-#   end
+  def calculate_requested_position(chess_notation)
+    requested_move = chess_notation.chars
+    vertical = requested_move[1].to_i
+    horizontal = @@board[requested_move[0]]
+    [horizontal, vertical - 1]
+  end
 
-#   def is_white
-#     @colour == 'white'
-#   end
+  def valid_moves
+    x = @position[0]
+    y = @position[1]
+    locate_attacking_fields(x, y)
+    valid_moves = [@attacking_fields].flatten(1)
+    p valid_moves
+  end
 
-#   def is_black
-#     @colour == 'black'
-#   end
-# end
+  def locate_attacking_fields(x, y)
+    @attacking_fields = []
+    p @@board.values
+    @@board.values.each do |field|
+      @attacking_fields << [[x, field], [field, y]]
+    end
+    @attacking_fields.flatten!(1)
+    @attacking_fields -= [x, y]
+
+  end
+
+  def valid_position_coordinates(x, y)
+    x < 8 && x >= 0 && y >= 0 && y < 8
+  end
+
+  def valid_colour(colour)
+    colours = %w[white black]
+    colours.include?(colour.downcase)
+  end
+
+  def is_white
+    @colour == 'white'
+  end
+
+  def is_black
+    @colour == 'black'
+  end
+end
