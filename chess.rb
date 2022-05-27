@@ -1,10 +1,13 @@
 
+class InvalidMoveError < StandardError
+  def initialize(msg="invalid move buddy")
+    super
+  end
+end
 
 class Pawn
 
-  # class MyError < StandardError
-  #   p "invalid move buddy"
-  # end
+
 
   attr_accessor :position
   attr_reader :colour, :attacking_fields, :symbol
@@ -30,7 +33,11 @@ class Pawn
 
   def move(chess_position_notation)
     target_position = calculate_requested_position(chess_position_notation)
-    valid_moves(target_position)
+
+    p valid_moves.include?(target_position)
+    raise InvalidMoveError unless valid_moves.include?(target_position)
+
+    @position = target_position
     # raise InvalidMoveError if !valid_moves(target_position)
 
     # if in_starting_position
@@ -46,10 +53,10 @@ class Pawn
     requested_move = chess_notation.chars
     vertical = requested_move[1].to_i
     horizontal = @@board[requested_move[0]]
-    [horizontal, vertical]
+    [horizontal, vertical - 1]
   end
 
-  def valid_moves(from_position)
+  def valid_moves
     set_modifier
     x = @position[0]
     y = @position[1]
@@ -110,9 +117,16 @@ class Pawn
   end
 end
 
-pawn = Pawn.new('black', 1, 4)
-    pawn.move('b5')
-    # p pawn.position
+pawn = Pawn.new('white', 1, 4)
+p pawn.position
+
+pawn.move('b6')
+p pawn.position
+
+pawn = Pawn.new('white', 1, 2)
+pawn.move('b4')
+assert_equal [1,4], pawn.position
+
 
 # class Rook
 #   attr_accessor :position

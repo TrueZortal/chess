@@ -16,9 +16,9 @@ class ChessTest < Minitest::Test
   end
 
   def test_white_pawn_can_move_2_fields_if_in_starting_position
-    skip
+    # skip
     pawn = Pawn.new('white', 1, 2)
-    pawn.move('b5')
+    pawn.move('b4')
     assert_equal [1,4], pawn.position
   end
 
@@ -26,27 +26,27 @@ class ChessTest < Minitest::Test
     skip
     pawn = Pawn.new('white', 1, 2)
     pawn.move('b3')
-    assert_equal [1,4], pawn.position
+    assert_equal [1,3], pawn.position
   end
 
   def test_white_pawn_moves_1_field_if_in_any_other_position
     skip
     pawn = Pawn.new('white', 1, 4)
-    pawn.move
+    pawn.move('b6')
     assert_equal [1,5], pawn.position
   end
 
   def test_black_pawn_moves_2_fields_if_in_starting_position
     skip
     pawn = Pawn.new('black', 1, 7)
-    pawn.move
+    pawn.move('b5')
     assert_equal [1,5], pawn.position
   end
 
   def test_black_pawn_moves_1_field_if_in_any_other_position
     skip
     pawn = Pawn.new('black', 1, 5)
-    pawn.move
+    pawn.move('b5')
     assert_equal [1,4], pawn.position
   end
 
