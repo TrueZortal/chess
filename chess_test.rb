@@ -74,9 +74,9 @@ class ChessTest < Minitest::Test
 
   def test_rook_can_move_diagonal
     # skip
-    rook = Rook.new('black', 2, 2)
-    rook.move('C8')
-    assert_equal [2,7], rook.position
+    rook = Rook.new('black', 0, 0)
+    rook.move('A8')
+    assert_equal [0,7], rook.position
   end
 
   def test_rook_can_move_horizontal
