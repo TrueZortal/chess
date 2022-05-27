@@ -1,14 +1,12 @@
+# frozen_string_literal: true
 
 class InvalidMoveError < StandardError
-  def initialize(msg="invalid move buddy")
+  def initialize(msg = 'invalid move buddy')
     super
   end
 end
 
 class Pawn
-
-
-
   attr_accessor :position
   attr_reader :colour, :attacking_fields, :symbol
 
@@ -23,8 +21,8 @@ class Pawn
     'h' => 7
   }
 
-  def initialize(colour,x,y)
-    raise ArgumentError if valid_position_coordinates(x, y) || valid_colour(colour)
+  def initialize(colour, x, y)
+    raise ArgumentError unless valid_colour(colour.downcase) && valid_position_coordinates(x, y)
 
     @symbol = 'P'
     @colour = colour.downcase
@@ -33,18 +31,9 @@ class Pawn
 
   def move(chess_position_notation)
     target_position = calculate_requested_position(chess_position_notation)
-
-    p valid_moves.include?(target_position)
     raise InvalidMoveError unless valid_moves.include?(target_position)
 
     @position = target_position
-    # raise InvalidMoveError if !valid_moves(target_position)
-
-    # if in_starting_position
-    #     @position[1] += 2 * @modifier
-    # else
-    #     @position[1] += 1 * @modifier
-    # end
   end
 
   private
@@ -69,7 +58,7 @@ class Pawn
     else
       valid_moves << [x, y + 1 * @modifier]
     end
-    p valid_moves
+    valid_moves
   end
 
   def locate_attacking_fields(x, y)
@@ -81,29 +70,29 @@ class Pawn
   end
 
   def valid_position_coordinates(x, y)
-    x > 8 || x < 1 || y < 1 || y > 8
+    x < 8 && x >= 0 && y >= 0 && y < 8
   end
 
   def valid_colour(colour)
-    colours = ['white', 'black']
-    !colours.include?(colour.downcase)
+    colours = %w[white black]
+    colours.include?(colour.downcase)
   end
 
   def in_starting_position
     if is_white
-      @position[1] == 2
+      @position[1] == 1
     elsif is_black
-      @position[1] == 7
+      @position[1] == 6
     end
   end
 
   def set_modifier
     @modifier = case @colour
-                  when 'white'
-                    1
-                  when 'black'
-                    -1
-                  end
+                when 'white'
+                  1
+                when 'black'
+                  -1
+                end
   end
 
   def is_white
@@ -116,17 +105,6 @@ class Pawn
     @colour == 'black'
   end
 end
-
-pawn = Pawn.new('white', 1, 4)
-p pawn.position
-
-pawn.move('b6')
-p pawn.position
-
-pawn = Pawn.new('white', 1, 2)
-pawn.move('b4')
-assert_equal [1,4], pawn.position
-
 
 # class Rook
 #   attr_accessor :position
