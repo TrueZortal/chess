@@ -33,7 +33,7 @@ class ChessPiece
   def calculate_requested_position(chess_notation)
     requested_move = chess_notation.chars
     vertical = requested_move[1].to_i
-    horizontal = @@board[requested_move[0]]
+    horizontal = @@board[requested_move[0].downcase]
     [horizontal, vertical - 1]
   end
 

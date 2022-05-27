@@ -41,7 +41,7 @@ class Pawn
   def calculate_requested_position(chess_notation)
     requested_move = chess_notation.chars
     vertical = requested_move[1].to_i
-    horizontal = @@board[requested_move[0]]
+    horizontal = @@board[requested_move[0].downcase]
     [horizontal, vertical - 1]
   end
 
@@ -131,6 +131,7 @@ class Rook
 
   def move(chess_position_notation)
     target_position = calculate_requested_position(chess_position_notation)
+    p target_position
     raise InvalidMoveError unless valid_moves.include?(target_position)
 
     @position = target_position
@@ -141,7 +142,7 @@ class Rook
   def calculate_requested_position(chess_notation)
     requested_move = chess_notation.chars
     vertical = requested_move[1].to_i
-    horizontal = @@board[requested_move[0]]
+    horizontal = @@board[requested_move[0].downcase]
     [horizontal, vertical - 1]
   end
 
@@ -150,17 +151,17 @@ class Rook
     y = @position[1]
     locate_attacking_fields(x, y)
     valid_moves = [@attacking_fields].flatten(1)
-    p valid_moves
+    valid_moves
   end
 
   def locate_attacking_fields(x, y)
     @attacking_fields = []
-    p @@board.values
     @@board.values.each do |field|
       @attacking_fields << [[x, field], [field, y]]
     end
     @attacking_fields.flatten!(1)
-    @attacking_fields -= [x, y]
+    @attacking_fields.delete_if {|field| field == [x, y]}
+
 
   end
 
@@ -181,3 +182,7 @@ class Rook
     @colour == 'black'
   end
 end
+
+rook = Rook.new('black', 0, 0)
+    rook.move('h1')
+    p rook.position

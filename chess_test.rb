@@ -80,14 +80,14 @@ class ChessTest < Minitest::Test
   end
 
   def test_rook_can_move_horizontal
-    skip
+    # skip
     rook = Rook.new('black', 0, 0)
     rook.move('h1')
     assert_equal [7,0], rook.position
   end
 
   def rook_cant_move_across
-    skip
+    # skip
     assert_raises(InvalidMoveError) do
       rook = Rook.new('black', 2, 2)
       rook.move('d4')
