@@ -30,10 +30,10 @@ class Pawn
   end
 
   def move(chess_position_notation)
-    target_position = calculate_requested_position(chess_position_notation)
-    raise InvalidMoveError unless valid_moves.include?(target_position)
+    @target_position = calculate_requested_position(chess_position_notation)
+    raise InvalidMoveError unless valid_moves.include?(@target_position)
 
-    @position = target_position
+    @position = @target_position
   end
 
   private
@@ -130,10 +130,10 @@ class Rook
   end
 
   def move(chess_position_notation)
-    target_position = calculate_requested_position(chess_position_notation)
-    raise InvalidMoveError unless valid_moves.include?(target_position)
+    @target_position = calculate_requested_position(chess_position_notation)
+    raise InvalidMoveError unless valid_moves.include?(@target_position)
 
-    @position = target_position
+    @position = @target_position
   end
 
   private
@@ -161,6 +161,94 @@ class Rook
     @attacking_fields.flatten!(1)
     @attacking_fields.delete_if {|field| field == [x, y]}
 
+
+  end
+
+  def valid_position_coordinates(x, y)
+    x < 8 && x >= 0 && y >= 0 && y < 8
+  end
+
+  def valid_colour(colour)
+    colours = %w[white black]
+    colours.include?(colour.downcase)
+  end
+
+  def is_white
+    @colour == 'white'
+  end
+
+  def is_black
+    @colour == 'black'
+  end
+end
+
+class Bishop
+  attr_accessor :position
+  attr_reader :colour, :attacking_fields, :symbol
+
+  @@board = {
+    'a' => 0,
+    'b' => 1,
+    'c' => 2,
+    'd' => 3,
+    'e' => 4,
+    'f' => 5,
+    'g' => 6,
+    'h' => 7
+  }
+
+  def initialize(colour, x, y)
+    raise ArgumentError unless valid_colour(colour.downcase) && valid_position_coordinates(x, y)
+
+    @symbol = 'B'
+    @colour = colour.downcase
+    @position = [x, y]
+  end
+
+  def move(chess_position_notation)
+    @target_position = calculate_requested_position(chess_position_notation)
+    raise InvalidMoveError unless valid_moves.include?(@target_position)
+
+    @position = @target_position
+  end
+
+  private
+
+  def calculate_requested_position(chess_notation)
+    requested_move = chess_notation.chars
+    vertical = requested_move[1].to_i
+    horizontal = @@board[requested_move[0].downcase]
+    [horizontal, vertical - 1]
+  end
+
+  def valid_moves
+    x = @position[0]
+    y = @position[1]
+    locate_attacking_fields(x, y)
+    valid_moves = [@attacking_fields].flatten(1)
+
+    valid_moves
+  end
+
+  def locate_attacking_fields(x, y)
+    @attacking_fields = []
+    temp_y = y
+    mod = 1
+    while temp_y > 0
+      temp_y -= 1
+      @attacking_fields << [x - mod, temp_y]
+      @attacking_fields << [x + mod, temp_y]
+      mod += 1
+    end
+    temp_y = y
+    mod = 1
+    while temp_y < 8
+      temp_y += 1
+      @attacking_fields << [x - mod, temp_y]
+      @attacking_fields << [x + mod, temp_y]
+      mod += 1
+    end
+    @attacking_fields.delete_if {|coordinate| coordinate.reduce {|x| x < 0 || x > 8}}
 
   end
 

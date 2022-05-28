@@ -94,4 +94,25 @@ class ChessTest < Minitest::Test
     end
   end
 
+  def test_bishop_starting_position_is_valid
+    # skip
+    assert_raises(ArgumentError) do
+      Bishop.new('white', 2, -2)
+    end
+  end
+
+  def test_bishop_can_move_diagonal
+    # skip
+    bishop = Bishop.new('black', 2, 2)
+    bishop.move('d4')
+    assert_equal [3,3], bishop.position
+  end
+
+  def test_bishop_cant_move_straight
+    # skip
+    assert_raises(InvalidMoveError) do
+      bishop = Bishop.new('black', 2, 2)
+      bishop.move('c4')
+    end
+  end
 end

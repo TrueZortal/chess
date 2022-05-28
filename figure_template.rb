@@ -22,10 +22,10 @@ class ChessPiece
   end
 
   def move(chess_position_notation)
-    target_position = calculate_requested_position(chess_position_notation)
-    raise InvalidMoveError unless valid_moves.include?(target_position)
+    @target_position = calculate_requested_position(chess_position_notation)
+    raise InvalidMoveError unless valid_moves.include?(@target_position)
 
-    @position = target_position
+    @position = @target_position
   end
 
   private
@@ -60,6 +60,7 @@ class ChessPiece
   def valid_colour(colour)
     colours = %w[white black]
     colours.include?(colour.downcase)
+  end
 
   def is_white
     @colour == 'white'
