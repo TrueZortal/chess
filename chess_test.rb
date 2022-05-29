@@ -105,6 +105,8 @@ class ChessTest < Minitest::Test
     # skip
     bishop = Bishop.new('black', 2, 2)
     bishop.move('d4')
+    bishop.move('g7')
+    bishop.move('d4')
     assert_equal [3,3], bishop.position
   end
 
@@ -113,6 +115,58 @@ class ChessTest < Minitest::Test
     assert_raises(InvalidMoveError) do
       bishop = Bishop.new('black', 2, 2)
       bishop.move('c4')
+    end
+  end
+
+  def test_knight_can_move_the_knightly_way
+    skip
+    knight = Knight.new('white', 2, 0)
+    knight.move('d3')
+    asser_equal [3, 2], knight.position
+  end
+
+  def test_knigth_cant_move_like_a_peasant
+    skip
+    assert_raises(InvalidMoveError) do
+      knight = Knight.new('white', 2, 0)
+      knight.move('c2')
+    end
+  end
+
+  def test_king_can_move_the_kingly_way
+    skip
+    king = King.new('white', 2, 0)
+    king.move('d1')
+    king.move('e1')
+    king.move('e2')
+    king.move('d3')
+    asser_equal [3, 2], king.position
+  end
+
+  def test_king_cant_move_like_someone_on_a_horse_or_something
+    skip
+    assert_raises(InvalidMoveError) do
+      king = King.new('white', 2, 0)
+      king.move('c4')
+    end
+  end
+
+  def test_queen_doesnt_walk_she_struts
+    skip
+    queen = Queen.new('white', 2, 0)
+    queen.move('d1')
+    queen.move('e5')
+    queen.move('g7')
+    queen.move('d7')
+    queen.move('d3')
+    asser_equal [3, 2], queen.position
+  end
+
+  def test_queen_cant_go_where_she_cant_go
+    skip
+    assert_raises(InvalidMoveError) do
+      queen = Queen.new('white', 2, 0)
+      queen.move('c4')
     end
   end
 end
