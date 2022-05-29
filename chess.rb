@@ -408,6 +408,11 @@ class King
     y = @position[1]
     locate_attacking_fields(x, y)
     valid_moves = [@attacking_fields].flatten(1)
+    if @unmoved == true && is_white
+      valid_moves << [[7,0],[0,0]]
+    elsif @unmoved == true && is_black
+      valid_moves << [[7,7],[0,7]]
+    end
 
     valid_moves.delete_if {|position| position == @position}
 
