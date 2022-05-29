@@ -698,4 +698,5 @@ chessboard.move_piece("b2", "b3")
 p chessboard.board["b3"]
 p chessboard.board["b2"]
 chessboard.move_piece("f7", "f5")
+chessboard.move_piece("g8", "f6")
 puts chessboard.show
