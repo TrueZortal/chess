@@ -156,7 +156,7 @@ class ChessTest < Minitest::Test
   end
 
   def test_queen_doesnt_walk_she_struts
-    skip
+    # skip
     queen = Queen.new('white', 2, 0)
     queen.move('d1')
     queen.move('e5')
