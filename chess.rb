@@ -599,6 +599,15 @@ class Queen
 end
 
 class Board
+
+  class EmptyField
+    attr_accessor :symbol
+
+    def initialize
+      @symbol = "*"
+    end
+  end
+
   attr_accessor :board
   def initialize
     generate_a_hash_of_fields
@@ -606,24 +615,40 @@ class Board
     print_board
   end
 
+  private
+
   def initial_setup
     ('a'..'h').each do |letter|
       @board["#{letter}2"] = Pawn.new('white', "#{letter}2")
       @board["#{letter}7"] = Pawn.new('black', "#{letter}7")
     end
+    colour = "white"
+    [1, 8].each do |outer_row|
+      @board["a#{outer_row}"] = Rook.new(colour, "a#{outer_row}")
+      @board["h#{outer_row}"] = Rook.new(colour, "h#{outer_row}")
+      @board["b#{outer_row}"] = Knight.new(colour, "b#{outer_row}")
+      @board["g#{outer_row}"] = Knight.new(colour, "g#{outer_row}")
+      @board["c#{outer_row}"] = Bishop.new(colour, "c#{outer_row}")
+      @board["f#{outer_row}"] = Bishop.new(colour, "f#{outer_row}")
+     colour = "black"
+    end
+      @board["e1"] = King.new("white", "e1")
+      @board["d8"] = King.new("black", "d8")
+      @board["d1"] = Queen.new("white", "d1")
+      @board["e8"] = Queen.new("black", "e8")
   end
 
   def print_board
     view = <<_
   A B C D E F G H
-1 #{@board["a1"]} #{@board["b1"]} #{@board["c1"]} #{@board["d1"]} #{@board["e1"]} #{@board["f1"]} #{@board["g1"]} #{@board["h1"]} 1
-2 #{@board["a2"]} #{@board["b2"]} #{@board["c2"]} #{@board["d2"]} #{@board["e2"]} #{@board["f2"]} #{@board["g2"]} #{@board["h2"]} 2
-3 #{@board["a3"]} #{@board["b3"]} #{@board["c3"]} #{@board["d3"]} #{@board["e3"]} #{@board["f3"]} #{@board["g3"]} #{@board["h3"]} 3
-4 #{@board["a4"]} #{@board["b4"]} #{@board["c4"]} #{@board["d4"]} #{@board["e4"]} #{@board["f4"]} #{@board["g4"]} #{@board["h4"]} 4
-5 #{@board["a5"]} #{@board["b5"]} #{@board["c5"]} #{@board["d5"]} #{@board["e5"]} #{@board["f5"]} #{@board["g5"]} #{@board["h5"]} 5
-6 #{@board["a6"]} #{@board["b6"]} #{@board["c6"]} #{@board["d6"]} #{@board["e6"]} #{@board["f6"]} #{@board["g6"]} #{@board["h6"]} 6
-7 #{@board["a7"]} #{@board["b7"]} #{@board["c7"]} #{@board["d7"]} #{@board["e7"]} #{@board["f7"]} #{@board["g7"]} #{@board["h7"]} 7
-8 #{@board["a8"]} #{@board["b8"]} #{@board["c8"]} #{@board["d8"]} #{@board["e8"]} #{@board["f8"]} #{@board["g8"]} #{@board["h8"]} 8
+1 #{@board["a1"].symbol} #{@board["b1"].symbol} #{@board["c1"].symbol} #{@board["d1"].symbol} #{@board["e1"].symbol} #{@board["f1"].symbol} #{@board["g1"].symbol} #{@board["h1"].symbol} 1
+2 #{@board["a2"].symbol} #{@board["b2"].symbol} #{@board["c2"].symbol} #{@board["d2"].symbol} #{@board["e2"].symbol} #{@board["f2"].symbol} #{@board["g2"].symbol} #{@board["h2"].symbol} 2
+3 #{@board["a3"].symbol} #{@board["b3"].symbol} #{@board["c3"].symbol} #{@board["d3"].symbol} #{@board["e3"].symbol} #{@board["f3"].symbol} #{@board["g3"].symbol} #{@board["h3"].symbol} 3
+4 #{@board["a4"].symbol} #{@board["b4"].symbol} #{@board["c4"].symbol} #{@board["d4"].symbol} #{@board["e4"].symbol} #{@board["f4"].symbol} #{@board["g4"].symbol} #{@board["h4"].symbol} 4
+5 #{@board["a5"].symbol} #{@board["b5"].symbol} #{@board["c5"].symbol} #{@board["d5"].symbol} #{@board["e5"].symbol} #{@board["f5"].symbol} #{@board["g5"].symbol} #{@board["h5"].symbol} 5
+6 #{@board["a6"].symbol} #{@board["b6"].symbol} #{@board["c6"].symbol} #{@board["d6"].symbol} #{@board["e6"].symbol} #{@board["f6"].symbol} #{@board["g6"].symbol} #{@board["h6"].symbol} 6
+7 #{@board["a7"].symbol} #{@board["b7"].symbol} #{@board["c7"].symbol} #{@board["d7"].symbol} #{@board["e7"].symbol} #{@board["f7"].symbol} #{@board["g7"].symbol} #{@board["h7"].symbol} 7
+8 #{@board["a8"].symbol} #{@board["b8"].symbol} #{@board["c8"].symbol} #{@board["d8"].symbol} #{@board["e8"].symbol} #{@board["f8"].symbol} #{@board["g8"].symbol} #{@board["h8"].symbol} 8
   A B C D E F G H
 _
 puts view
@@ -633,12 +658,10 @@ puts view
     @board = Hash.new
     ('a'..'h').each do |letter|
       (1..8).each do |index|
-        @board["#{letter}#{index}"] = "*"
+        @board["#{letter}#{index}"] = EmptyField.new
       end
     end
     @board
   end
 end
 
-chessboard = Board.new
-chessboard.board['a1']
