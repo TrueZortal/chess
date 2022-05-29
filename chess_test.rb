@@ -138,17 +138,17 @@ class ChessTest < Minitest::Test
   end
 
   def test_king_can_move_the_kingly_way
-    skip
+    # skip
     king = King.new('white', 2, 0)
     king.move('d1')
     king.move('e1')
     king.move('e2')
     king.move('d3')
-    asser_equal [3, 2], king.position
+    assert_equal [3, 2], king.position
   end
 
   def test_king_cant_move_like_someone_on_a_horse_or_something
-    skip
+    # skip
     assert_raises(InvalidMoveError) do
       king = King.new('white', 2, 0)
       king.move('c4')

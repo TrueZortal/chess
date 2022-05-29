@@ -43,7 +43,7 @@ class ChessPiece
     locate_attacking_fields(x, y)
     valid_moves = [@attacking_fields].flatten(1)
 
-    valid_moves
+    valid_moves.delete_if {|position| position == @position}
   end
 
   def locate_attacking_fields(x, y)

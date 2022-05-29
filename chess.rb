@@ -58,7 +58,7 @@ class Pawn
     else
       valid_moves << [x, y + 1 * @modifier]
     end
-    valid_moves
+    valid_moves.delete_if {|position| position == @position}
   end
 
   def locate_attacking_fields(x, y)
@@ -150,7 +150,8 @@ class Rook
     y = @position[1]
     locate_attacking_fields(x, y)
     valid_moves = [@attacking_fields].flatten(1)
-    valid_moves
+
+    valid_moves.delete_if {|position| position == @position}
   end
 
   def locate_attacking_fields(x, y)
@@ -227,7 +228,7 @@ class Bishop
     locate_attacking_fields(x, y)
     valid_moves = [@attacking_fields].flatten(1)
 
-    valid_moves
+    valid_moves.delete_if {|position| position == @position}
   end
 
   def locate_attacking_fields(x, y)
@@ -315,7 +316,7 @@ class Knight
     locate_attacking_fields(x, y)
     valid_moves = [@attacking_fields].flatten(2)
 
-    valid_moves
+    valid_moves.delete_if {|position| position == @position}
   end
 
   def locate_attacking_fields(x, y)
@@ -333,6 +334,83 @@ class Knight
       mod_2 = 1
     end
     @attacking_fields
+  end
+
+  def valid_position_coordinates(x, y)
+    x < 8 && x >= 0 && y >= 0 && y < 8
+  end
+
+  def valid_colour(colour)
+    colours = %w[white black]
+    colours.include?(colour.downcase)
+  end
+
+  def is_white
+    @colour == 'white'
+  end
+
+  def is_black
+    @colour == 'black'
+  end
+end
+
+class King
+  attr_accessor :position
+  attr_reader :colour, :attacking_fields, :symbol
+
+  @@board = {
+    'a' => 0,
+    'b' => 1,
+    'c' => 2,
+    'd' => 3,
+    'e' => 4,
+    'f' => 5,
+    'g' => 6,
+    'h' => 7
+  }
+
+  def initialize(colour, x, y)
+    raise ArgumentError unless valid_colour(colour.downcase) && valid_position_coordinates(x, y)
+
+    @symbol = 'KK'
+    @colour = colour.downcase
+    @position = [x, y]
+  end
+
+  def move(chess_position_notation)
+    @target_position = calculate_requested_position(chess_position_notation)
+    raise InvalidMoveError unless valid_moves.include?(@target_position)
+
+    @position = @target_position
+  end
+
+  private
+
+  def calculate_requested_position(chess_notation)
+    requested_move = chess_notation.chars
+    vertical = requested_move[1].to_i
+    horizontal = @@board[requested_move[0].downcase]
+    [horizontal, vertical - 1]
+  end
+
+  def valid_moves
+    x = @position[0]
+    y = @position[1]
+    locate_attacking_fields(x, y)
+    valid_moves = [@attacking_fields].flatten(1)
+
+    valid_moves.delete_if {|position| position == @position}
+
+  end
+
+  def locate_attacking_fields(x, y)
+      @attacking_fields = []
+      [1, 0, -1].each do |num_x|
+        [1, 0, -1].each do |num_y|
+          @attacking_fields << [x + num_x, y + num_y]
+        end
+      end
+      @attacking_fields
   end
 
   def valid_position_coordinates(x, y)
