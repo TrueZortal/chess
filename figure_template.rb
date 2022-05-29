@@ -13,13 +13,13 @@ class ChessPiece
     'h' => 7
   }
 
-  def initialize(colour, x, y)
-    raise ArgumentError unless valid_colour(colour.downcase) && valid_position_coordinates(x, y)
+  def initialize(colour, initial_position)
+    raise ArgumentError unless valid_colour(colour.downcase) && valid_position_coordinates(calculate_requested_position(initial_position)[0], calculate_requested_position(initial_position)[1])
 
     @unmoved = true
-    @symbol = 'symbol'
+    assign_symbol
     @colour = colour.downcase
-    @position = [x, y]
+    @position = calculate_requested_position(initial_position)
   end
 
   def move(chess_position_notation)
@@ -34,6 +34,9 @@ class ChessPiece
 
   def calculate_requested_position(chess_notation)
     requested_move = chess_notation.chars
+
+    raise ArgumentError unless @@board.include?(requested_move[0].downcase)
+
     vertical = requested_move[1].to_i
     horizontal = @@board[requested_move[0].downcase]
     [horizontal, vertical - 1]
