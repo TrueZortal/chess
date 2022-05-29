@@ -122,7 +122,7 @@ class Pawn
 end
 
 class Rook
-  attr_accessor :position
+  attr_accessor :position, :chess_notation_position
   attr_reader :colour, :attacking_fields, :symbol, :unmoved
 
   @@board = {
@@ -211,7 +211,7 @@ class Rook
 end
 
 class Bishop
-  attr_accessor :position
+  attr_accessor :position, :chess_notation_position
   attr_reader :colour, :attacking_fields, :symbol, :unmoved
 
   @@board = {
@@ -313,7 +313,7 @@ class Bishop
 end
 
 class Knight
-  attr_accessor :position
+  attr_accessor :position, :chess_notation_position
   attr_reader :colour, :attacking_fields, :symbol, :unmoved
 
   @@board = {
@@ -410,7 +410,7 @@ class Knight
 end
 
 class King
-  attr_accessor :position
+  attr_accessor :position, :chess_notation_position
   attr_reader :colour, :attacking_fields, :symbol, :unmoved
 
   @@board = {
@@ -506,7 +506,7 @@ class King
 end
 
 class Queen
-  attr_accessor :position
+  attr_accessor :position, :chess_notation_position
   attr_reader :colour, :attacking_fields, :symbol, :unmoved
 
   @@board = {
@@ -628,15 +628,19 @@ class Board
   end
 
   def move_piece(starting_field, target_field)
-    if @board[target_field].symbol == "*"
+    if @board[target_field].symbol == '*'
       @board[starting_field].move(target_field)
         if @board[starting_field].chess_notation_position == target_field
           @board[target_field] = @board[starting_field]
           @board[starting_field] = EmptyField.new
         else
-          p "invalid move"
+          puts "invalid move not sure why but I like conditionals"
         end
-      end
+      elsif @board[target_field].symbol != '*' && @board[starting_field].symbol != '*' && !@board[starting_field].attacking_fields.include?(@board[target_field].position)
+        puts "invalid move, field occupied"
+      elsif @board[target_field].symbol != '*' && @board[starting_field].symbol != '*' && @board[starting_field].attacking_fields.include?(@board[target_field].position)
+        puts "to boink"
+    end
   end
 
   def show
@@ -693,10 +697,13 @@ view
   end
 end
 
-chessboard = Board.new
-chessboard.move_piece("b2", "b3")
-p chessboard.board["b3"]
-p chessboard.board["b2"]
-chessboard.move_piece("f7", "f5")
-chessboard.move_piece("g8", "f6")
-puts chessboard.show
+# chessboard = Board.new
+# chessboard.move_piece("b2", "b3")
+# p chessboard.board["b3"]
+# p chessboard.board["b2"]
+# chessboard.move_piece("f7", "f5")
+# chessboard.move_piece("g8", "f6")
+# chessboard.move_piece("f6", "d7")
+# chessboard.move_piece("f6", "d5")
+# chessboard.move_piece("f6", "c7")
+# puts chessboard.show
