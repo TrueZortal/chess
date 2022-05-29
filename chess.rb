@@ -8,7 +8,7 @@ end
 
 class Pawn
   attr_accessor :position
-  attr_reader :colour, :attacking_fields, :symbol
+  attr_reader :colour, :attacking_fields, :symbol, :unmoved
 
   @@board = {
     'a' => 0,
@@ -24,6 +24,7 @@ class Pawn
   def initialize(colour, x, y)
     raise ArgumentError unless valid_colour(colour.downcase) && valid_position_coordinates(x, y)
 
+    @unmoved = true
     @symbol = 'P'
     @colour = colour.downcase
     @position = [x, y]
@@ -33,6 +34,7 @@ class Pawn
     @target_position = calculate_requested_position(chess_position_notation)
     raise InvalidMoveError unless valid_moves.include?(@target_position)
 
+    @unmoved = false
     @position = @target_position
   end
 
@@ -108,7 +110,7 @@ end
 
 class Rook
   attr_accessor :position
-  attr_reader :colour, :attacking_fields, :symbol
+  attr_reader :colour, :attacking_fields, :symbol, :unmoved
 
   @@board = {
     'a' => 0,
@@ -124,6 +126,7 @@ class Rook
   def initialize(colour, x, y)
     raise ArgumentError unless valid_colour(colour.downcase) && valid_position_coordinates(x, y)
 
+    @unmoved = true
     @symbol = 'R'
     @colour = colour.downcase
     @position = [x, y]
@@ -133,6 +136,7 @@ class Rook
     @target_position = calculate_requested_position(chess_position_notation)
     raise InvalidMoveError unless valid_moves.include?(@target_position)
 
+    @unmoved = false
     @position = @target_position
   end
 
@@ -185,7 +189,7 @@ end
 
 class Bishop
   attr_accessor :position
-  attr_reader :colour, :attacking_fields, :symbol
+  attr_reader :colour, :attacking_fields, :symbol, :unmoved
 
   @@board = {
     'a' => 0,
@@ -201,6 +205,7 @@ class Bishop
   def initialize(colour, x, y)
     raise ArgumentError unless valid_colour(colour.downcase) && valid_position_coordinates(x, y)
 
+    @unmoved = true
     @symbol = 'B'
     @colour = colour.downcase
     @position = [x, y]
@@ -210,6 +215,7 @@ class Bishop
     @target_position = calculate_requested_position(chess_position_notation)
     raise InvalidMoveError unless valid_moves.include?(@target_position)
 
+    @unmoved = false
     @position = @target_position
   end
 
@@ -273,7 +279,7 @@ end
 
 class Knight
   attr_accessor :position
-  attr_reader :colour, :attacking_fields, :symbol
+  attr_reader :colour, :attacking_fields, :symbol, :unmoved
 
   @@board = {
     'a' => 0,
@@ -289,6 +295,7 @@ class Knight
   def initialize(colour, x, y)
     raise ArgumentError unless valid_colour(colour.downcase) && valid_position_coordinates(x, y)
 
+    @unmoved = true
     @symbol = 'K'
     @colour = colour.downcase
     @position = [x, y]
@@ -298,6 +305,7 @@ class Knight
     @target_position = calculate_requested_position(chess_position_notation)
     raise InvalidMoveError unless valid_moves.include?(@target_position)
 
+    @unmoved = false
     @position = @target_position
   end
 
@@ -356,7 +364,7 @@ end
 
 class King
   attr_accessor :position
-  attr_reader :colour, :attacking_fields, :symbol
+  attr_reader :colour, :attacking_fields, :symbol, :unmoved
 
   @@board = {
     'a' => 0,
@@ -372,6 +380,7 @@ class King
   def initialize(colour, x, y)
     raise ArgumentError unless valid_colour(colour.downcase) && valid_position_coordinates(x, y)
 
+    @unmoved = true
     @symbol = 'KK'
     @colour = colour.downcase
     @position = [x, y]
@@ -381,6 +390,7 @@ class King
     @target_position = calculate_requested_position(chess_position_notation)
     raise InvalidMoveError unless valid_moves.include?(@target_position)
 
+    @unmoved = false
     @position = @target_position
   end
 

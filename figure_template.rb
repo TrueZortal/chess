@@ -1,6 +1,6 @@
 class ChessPiece
   attr_accessor :position
-  attr_reader :colour, :attacking_fields, :symbol
+  attr_reader :colour, :attacking_fields, :symbol, :unmoved
 
   @@board = {
     'a' => 0,
@@ -16,6 +16,7 @@ class ChessPiece
   def initialize(colour, x, y)
     raise ArgumentError unless valid_colour(colour.downcase) && valid_position_coordinates(x, y)
 
+    @unmoved = true
     @symbol = 'symbol'
     @colour = colour.downcase
     @position = [x, y]
@@ -25,6 +26,7 @@ class ChessPiece
     @target_position = calculate_requested_position(chess_position_notation)
     raise InvalidMoveError unless valid_moves.include?(@target_position)
 
+    @unmoved = false
     @position = @target_position
   end
 
