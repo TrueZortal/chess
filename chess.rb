@@ -7,7 +7,7 @@ class InvalidMoveError < StandardError
 end
 
 class Pawn
-  attr_accessor :position
+  attr_accessor :position, :chess_notation_position
   attr_reader :colour, :attacking_fields, :symbol, :unmoved
 
   @@board = {
@@ -27,7 +27,8 @@ class Pawn
     @unmoved = true
     assign_symbol
     @colour = colour.downcase
-    @position = calculate_requested_position(initial_position)
+    @chess_notation_position = initial_position
+    @position = calculate_requested_position(@chess_notation_position)
   end
 
   def move(chess_position_notation)
@@ -35,6 +36,7 @@ class Pawn
     raise InvalidMoveError unless valid_moves.include?(@target_position)
 
     @unmoved = false
+    @chess_notation_position = chess_position_notation
     @position = @target_position
   end
 
@@ -140,7 +142,8 @@ class Rook
     @unmoved = true
     assign_symbol
     @colour = colour.downcase
-    @position = calculate_requested_position(initial_position)
+    @chess_notation_position = initial_position
+    @position = calculate_requested_position(@chess_notation_position)
   end
 
   def move(chess_position_notation)
@@ -148,6 +151,7 @@ class Rook
     raise InvalidMoveError unless valid_moves.include?(@target_position)
 
     @unmoved = false
+    @chess_notation_position = chess_position_notation
     @position = @target_position
   end
 
@@ -227,7 +231,8 @@ class Bishop
     @unmoved = true
     assign_symbol
     @colour = colour.downcase
-    @position = calculate_requested_position(initial_position)
+    @chess_notation_position = initial_position
+    @position = calculate_requested_position(@chess_notation_position)
   end
 
   def move(chess_position_notation)
@@ -235,6 +240,7 @@ class Bishop
     raise InvalidMoveError unless valid_moves.include?(@target_position)
 
     @unmoved = false
+    @chess_notation_position = chess_position_notation
     @position = @target_position
   end
 
@@ -327,7 +333,8 @@ class Knight
     @unmoved = true
     assign_symbol
     @colour = colour.downcase
-    @position = calculate_requested_position(initial_position)
+    @chess_notation_position = initial_position
+    @position = calculate_requested_position(@chess_notation_position)
   end
 
   def move(chess_position_notation)
@@ -335,6 +342,7 @@ class Knight
     raise InvalidMoveError unless valid_moves.include?(@target_position)
 
     @unmoved = false
+    @chess_notation_position = chess_position_notation
     @position = @target_position
   end
 
@@ -422,7 +430,8 @@ class King
     @unmoved = true
     assign_symbol
     @colour = colour.downcase
-    @position = calculate_requested_position(initial_position)
+    @chess_notation_position = initial_position
+    @position = calculate_requested_position(@chess_notation_position)
   end
 
   def move(chess_position_notation)
@@ -430,6 +439,7 @@ class King
     raise InvalidMoveError unless valid_moves.include?(@target_position)
 
     @unmoved = false
+    @chess_notation_position = chess_position_notation
     @position = @target_position
   end
 
@@ -516,7 +526,8 @@ class Queen
     @unmoved = true
     assign_symbol
     @colour = colour.downcase
-    @position = calculate_requested_position(initial_position)
+    @chess_notation_position = initial_position
+    @position = calculate_requested_position(@chess_notation_position)
   end
 
   def move(chess_position_notation)
@@ -524,6 +535,7 @@ class Queen
     raise InvalidMoveError unless valid_moves.include?(@target_position)
 
     @unmoved = false
+    @chess_notation_position = chess_position_notation
     @position = @target_position
   end
 
@@ -608,10 +620,26 @@ class Board
     end
   end
 
-  attr_accessor :board
+  attr_accessor :board, :show
+
   def initialize
     generate_a_hash_of_fields
     initial_setup
+  end
+
+  def move_piece(starting_field, target_field)
+    if @board[target_field].symbol == "*"
+      @board[starting_field].move(target_field)
+        if @board[starting_field].chess_notation_position == target_field
+          @board[target_field] = @board[starting_field]
+          @board[starting_field] = EmptyField.new
+        else
+          p "invalid move"
+        end
+      end
+  end
+
+  def show
     print_board
   end
 
@@ -651,7 +679,7 @@ class Board
 8 #{@board["a8"].symbol} #{@board["b8"].symbol} #{@board["c8"].symbol} #{@board["d8"].symbol} #{@board["e8"].symbol} #{@board["f8"].symbol} #{@board["g8"].symbol} #{@board["h8"].symbol} 8
   A B C D E F G H
 _
-puts view
+view
   end
 
   def generate_a_hash_of_fields
@@ -665,3 +693,9 @@ puts view
   end
 end
 
+chessboard = Board.new
+chessboard.move_piece("b2", "b3")
+p chessboard.board["b3"]
+p chessboard.board["b2"]
+chessboard.move_piece("f7", "f5")
+puts chessboard.show

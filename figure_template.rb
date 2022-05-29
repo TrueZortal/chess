@@ -19,7 +19,8 @@ class ChessPiece
     @unmoved = true
     assign_symbol
     @colour = colour.downcase
-    @position = calculate_requested_position(initial_position)
+    @chess_notation_position = initial_position
+    @position = calculate_requested_position(@chess_notation_position)
   end
 
   def move(chess_position_notation)
@@ -27,6 +28,7 @@ class ChessPiece
     raise InvalidMoveError unless valid_moves.include?(@target_position)
 
     @unmoved = false
+    @chess_notation_position = chess_position_notation
     @position = @target_position
   end
 
