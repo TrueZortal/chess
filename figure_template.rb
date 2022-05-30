@@ -1,5 +1,5 @@
 class ChessPiece
-  attr_accessor :position
+  attr_accessor :position, :chess_notation_position
   attr_reader :colour, :attacking_fields, :symbol, :unmoved
 
   @@board = {

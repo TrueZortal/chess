@@ -6,7 +6,7 @@ class InvalidMoveError < StandardError
   end
 end
 
-class Pawn
+class ChessPiece
   attr_accessor :position, :chess_notation_position
   attr_reader :colour, :attacking_fields, :symbol, :unmoved
 
@@ -22,17 +22,17 @@ class Pawn
   }
 
   def initialize(colour, initial_position)
-    raise ArgumentError unless valid_colour(colour.downcase) && valid_position_coordinates(calculate_requested_position(initial_position)[0], calculate_requested_position(initial_position)[1])
+    raise ArgumentError unless valid_colour(colour.downcase) && valid_position_coordinates(calculate_position(initial_position)[0], calculate_position(initial_position)[1])
 
     @unmoved = true
     assign_symbol
     @colour = colour.downcase
     @chess_notation_position = initial_position
-    @position = calculate_requested_position(@chess_notation_position)
+    @position = calculate_position(@chess_notation_position)
   end
 
   def move(chess_position_notation)
-    @target_position = calculate_requested_position(chess_position_notation)
+    @target_position = calculate_position(chess_position_notation)
     raise InvalidMoveError unless valid_moves.include?(@target_position)
 
     @unmoved = false
@@ -42,15 +42,7 @@ class Pawn
 
   private
 
-  def assign_symbol
-    if is_white
-      @symbol = "♟"
-    else
-      @symbol = "♙"
-    end
-  end
-
-  def calculate_requested_position(chess_notation)
+  def calculate_position(chess_notation)
     requested_move = chess_notation.chars
 
     raise ArgumentError unless @@board.include?(requested_move[0].downcase)
@@ -58,30 +50,6 @@ class Pawn
     vertical = requested_move[1].to_i
     horizontal = @@board[requested_move[0].downcase]
     [horizontal, vertical - 1]
-  end
-
-  def valid_moves
-    set_modifier
-    x = @position[0]
-    y = @position[1]
-    locate_attacking_fields(x, y)
-    valid_moves = [@attacking_fields].flatten(1)
-
-    if in_starting_position
-      valid_positions = [[x, y + 2 * @modifier], [x, y + 1 * @modifier]]
-      valid_moves.concat(valid_positions)
-    else
-      valid_moves << [x, y + 1 * @modifier]
-    end
-    valid_moves.delete_if {|position| position == @position}
-  end
-
-  def locate_attacking_fields(x, y)
-    if is_white
-      @attacking_fields = [[x - 1, y + 1], [x + 1, y + 1]]
-    elsif is_black
-      @attacking_fields = [[x - 1, y - 1], [x + 1, y - 1]]
-    end
   end
 
   def valid_position_coordinates(x, y)
@@ -93,11 +61,50 @@ class Pawn
     colours.include?(colour.downcase)
   end
 
-  def in_starting_position
+  def is_white
+    @colour == 'white'
+  end
+
+  def is_black
+    @colour == 'black'
+  end
+end
+
+class Pawn < ChessPiece
+
+  private
+
+  def assign_symbol
     if is_white
-      @position[1] == 1
+      @symbol = "♟"
+    else
+      @symbol = "♙"
+    end
+  end
+
+  def valid_moves
+    set_modifier
+    x = @position[0]
+    y = @position[1]
+    locate_attacking_fields(x, y)
+    valid_moves = [@attacking_fields].flatten(1)
+
+    if unmoved == true
+      valid_positions = [[x, y + 2 * @modifier], [x, y + 1 * @modifier]]
+      valid_moves.concat(valid_positions)
+    else
+      valid_moves << [x, y + 1 * @modifier]
+    end
+    valid_moves.delete_if {|position| position == @position}
+  end
+
+  def locate_attacking_fields(x, y)
+    if is_white
+      set_modifier
+      @attacking_fields = [[x - 1, y + 1], [x + 1, y + 1]]
     elsif is_black
-      @position[1] == 6
+      set_modifier
+      @attacking_fields = [[x - 1, y - 1], [x + 1, y - 1]]
     end
   end
 
@@ -109,52 +116,9 @@ class Pawn
                   -1
                 end
   end
-
-  def is_white
-    @modifier = 1
-    @colour == 'white'
-  end
-
-  def is_black
-    @modifier = -1
-    @colour == 'black'
-  end
 end
 
-class Rook
-  attr_accessor :position, :chess_notation_position
-  attr_reader :colour, :attacking_fields, :symbol, :unmoved
-
-  @@board = {
-    'a' => 0,
-    'b' => 1,
-    'c' => 2,
-    'd' => 3,
-    'e' => 4,
-    'f' => 5,
-    'g' => 6,
-    'h' => 7
-  }
-
-  def initialize(colour, initial_position)
-    raise ArgumentError unless valid_colour(colour.downcase) && valid_position_coordinates(calculate_requested_position(initial_position)[0], calculate_requested_position(initial_position)[1])
-
-    @unmoved = true
-    assign_symbol
-    @colour = colour.downcase
-    @chess_notation_position = initial_position
-    @position = calculate_requested_position(@chess_notation_position)
-  end
-
-  def move(chess_position_notation)
-    @target_position = calculate_requested_position(chess_position_notation)
-    raise InvalidMoveError unless valid_moves.include?(@target_position)
-
-    @unmoved = false
-    @chess_notation_position = chess_position_notation
-    @position = @target_position
-  end
-
+class Rook < ChessPiece
   private
 
   def assign_symbol
@@ -163,15 +127,6 @@ class Rook
     else
       @symbol = "♖"
     end
-  end
-
-  def calculate_requested_position(chess_notation)
-    requested_move = chess_notation.chars
-    raise ArgumentError unless @@board.include?(requested_move[0].downcase)
-
-    vertical = requested_move[1].to_i
-    horizontal = @@board[requested_move[0].downcase]
-    [horizontal, vertical - 1]
   end
 
   def valid_moves
@@ -191,58 +146,9 @@ class Rook
     @attacking_fields.flatten!(1)
     @attacking_fields.delete_if {|field| field == [x, y]}
   end
-
-  def valid_position_coordinates(x, y)
-    x < 8 && x >= 0 && y >= 0 && y < 8
-  end
-
-  def valid_colour(colour)
-    colours = %w[white black]
-    colours.include?(colour.downcase)
-  end
-
-  def is_white
-    @colour == 'white'
-  end
-
-  def is_black
-    @colour == 'black'
-  end
 end
 
-class Bishop
-  attr_accessor :position, :chess_notation_position
-  attr_reader :colour, :attacking_fields, :symbol, :unmoved
-
-  @@board = {
-    'a' => 0,
-    'b' => 1,
-    'c' => 2,
-    'd' => 3,
-    'e' => 4,
-    'f' => 5,
-    'g' => 6,
-    'h' => 7
-  }
-
-  def initialize(colour, initial_position)
-    raise ArgumentError unless valid_colour(colour.downcase) && valid_position_coordinates(calculate_requested_position(initial_position)[0], calculate_requested_position(initial_position)[1])
-
-    @unmoved = true
-    assign_symbol
-    @colour = colour.downcase
-    @chess_notation_position = initial_position
-    @position = calculate_requested_position(@chess_notation_position)
-  end
-
-  def move(chess_position_notation)
-    @target_position = calculate_requested_position(chess_position_notation)
-    raise InvalidMoveError unless valid_moves.include?(@target_position)
-
-    @unmoved = false
-    @chess_notation_position = chess_position_notation
-    @position = @target_position
-  end
+class Bishop < ChessPiece
 
   private
 
@@ -252,15 +158,6 @@ class Bishop
     else
       @symbol = "♗"
     end
-  end
-
-  def calculate_requested_position(chess_notation)
-    requested_move = chess_notation.chars
-    raise ArgumentError unless @@board.include?(requested_move[0].downcase)
-
-    vertical = requested_move[1].to_i
-    horizontal = @@board[requested_move[0].downcase]
-    [horizontal, vertical - 1]
   end
 
   def valid_moves
@@ -291,60 +188,10 @@ class Bishop
       mod += 1
     end
     @attacking_fields
-
-  end
-
-  def valid_position_coordinates(x, y)
-    x < 8 && x >= 0 && y >= 0 && y < 8
-  end
-
-  def valid_colour(colour)
-    colours = %w[white black]
-    colours.include?(colour.downcase)
-  end
-
-  def is_white
-    @colour == 'white'
-  end
-
-  def is_black
-    @colour == 'black'
   end
 end
 
-class Knight
-  attr_accessor :position, :chess_notation_position
-  attr_reader :colour, :attacking_fields, :symbol, :unmoved
-
-  @@board = {
-    'a' => 0,
-    'b' => 1,
-    'c' => 2,
-    'd' => 3,
-    'e' => 4,
-    'f' => 5,
-    'g' => 6,
-    'h' => 7
-  }
-
-  def initialize(colour, initial_position)
-    raise ArgumentError unless valid_colour(colour.downcase) && valid_position_coordinates(calculate_requested_position(initial_position)[0], calculate_requested_position(initial_position)[1])
-
-    @unmoved = true
-    assign_symbol
-    @colour = colour.downcase
-    @chess_notation_position = initial_position
-    @position = calculate_requested_position(@chess_notation_position)
-  end
-
-  def move(chess_position_notation)
-    @target_position = calculate_requested_position(chess_position_notation)
-    raise InvalidMoveError unless valid_moves.include?(@target_position)
-
-    @unmoved = false
-    @chess_notation_position = chess_position_notation
-    @position = @target_position
-  end
+class Knight < ChessPiece
 
   private
 
@@ -354,15 +201,6 @@ class Knight
     else
       @symbol = "♘"
     end
-  end
-
-  def calculate_requested_position(chess_notation)
-    requested_move = chess_notation.chars
-    raise ArgumentError unless @@board.include?(requested_move[0].downcase)
-
-    vertical = requested_move[1].to_i
-    horizontal = @@board[requested_move[0].downcase]
-    [horizontal, vertical - 1]
   end
 
   def valid_moves
@@ -390,58 +228,9 @@ class Knight
     end
     @attacking_fields
   end
-
-  def valid_position_coordinates(x, y)
-    x < 8 && x >= 0 && y >= 0 && y < 8
-  end
-
-  def valid_colour(colour)
-    colours = %w[white black]
-    colours.include?(colour.downcase)
-  end
-
-  def is_white
-    @colour == 'white'
-  end
-
-  def is_black
-    @colour == 'black'
-  end
 end
 
-class King
-  attr_accessor :position, :chess_notation_position
-  attr_reader :colour, :attacking_fields, :symbol, :unmoved
-
-  @@board = {
-    'a' => 0,
-    'b' => 1,
-    'c' => 2,
-    'd' => 3,
-    'e' => 4,
-    'f' => 5,
-    'g' => 6,
-    'h' => 7
-  }
-
-  def initialize(colour, initial_position)
-    raise ArgumentError unless valid_colour(colour.downcase) && valid_position_coordinates(calculate_requested_position(initial_position)[0], calculate_requested_position(initial_position)[1])
-
-    @unmoved = true
-    assign_symbol
-    @colour = colour.downcase
-    @chess_notation_position = initial_position
-    @position = calculate_requested_position(@chess_notation_position)
-  end
-
-  def move(chess_position_notation)
-    @target_position = calculate_requested_position(chess_position_notation)
-    raise InvalidMoveError unless valid_moves.include?(@target_position)
-
-    @unmoved = false
-    @chess_notation_position = chess_position_notation
-    @position = @target_position
-  end
+class King < ChessPiece
 
   private
 
@@ -451,15 +240,6 @@ class King
     else
       @symbol = "♔"
     end
-  end
-
-  def calculate_requested_position(chess_notation)
-    requested_move = chess_notation.chars
-    raise ArgumentError unless @@board.include?(requested_move[0].downcase)
-
-    vertical = requested_move[1].to_i
-    horizontal = @@board[requested_move[0].downcase]
-    [horizontal, vertical - 1]
   end
 
   def valid_moves
@@ -487,57 +267,9 @@ class King
       @attacking_fields
   end
 
-  def valid_position_coordinates(x, y)
-    x < 8 && x >= 0 && y >= 0 && y < 8
-  end
-
-  def valid_colour(colour)
-    colours = %w[white black]
-    colours.include?(colour.downcase)
-  end
-
-  def is_white
-    @colour == 'white'
-  end
-
-  def is_black
-    @colour == 'black'
-  end
 end
 
-class Queen
-  attr_accessor :position, :chess_notation_position
-  attr_reader :colour, :attacking_fields, :symbol, :unmoved
-
-  @@board = {
-    'a' => 0,
-    'b' => 1,
-    'c' => 2,
-    'd' => 3,
-    'e' => 4,
-    'f' => 5,
-    'g' => 6,
-    'h' => 7
-  }
-
-  def initialize(colour, initial_position)
-    raise ArgumentError unless valid_colour(colour.downcase) && valid_position_coordinates(calculate_requested_position(initial_position)[0], calculate_requested_position(initial_position)[1])
-
-    @unmoved = true
-    assign_symbol
-    @colour = colour.downcase
-    @chess_notation_position = initial_position
-    @position = calculate_requested_position(@chess_notation_position)
-  end
-
-  def move(chess_position_notation)
-    @target_position = calculate_requested_position(chess_position_notation)
-    raise InvalidMoveError unless valid_moves.include?(@target_position)
-
-    @unmoved = false
-    @chess_notation_position = chess_position_notation
-    @position = @target_position
-  end
+class Queen < ChessPiece
 
   private
 
@@ -547,15 +279,6 @@ class Queen
     else
       @symbol = "♕"
     end
-  end
-
-  def calculate_requested_position(chess_notation)
-    requested_move = chess_notation.chars
-    raise ArgumentError unless @@board.include?(requested_move[0].downcase)
-
-    vertical = requested_move[1].to_i
-    horizontal = @@board[requested_move[0].downcase]
-    [horizontal, vertical - 1]
   end
 
   def valid_moves
@@ -591,29 +314,12 @@ class Queen
     end
     @attacking_fields
   end
-
-  def valid_position_coordinates(x, y)
-    x < 8 && x >= 0 && y >= 0 && y < 8
-  end
-
-  def valid_colour(colour)
-    colours = %w[white black]
-    colours.include?(colour.downcase)
-  end
-
-  def is_white
-    @colour == 'white'
-  end
-
-  def is_black
-    @colour == 'black'
-  end
 end
 
 class Board
 
   class EmptyField
-    attr_accessor :symbol
+    attr_reader :symbol
 
     def initialize
       @symbol = "*"
@@ -636,10 +342,10 @@ class Board
         else
           puts "invalid move not sure why but I like conditionals"
         end
-      elsif @board[target_field].symbol != '*' && @board[starting_field].symbol != '*' && !@board[starting_field].attacking_fields.include?(@board[target_field].position)
-        puts "invalid move, field occupied"
-      elsif @board[target_field].symbol != '*' && @board[starting_field].symbol != '*' && @board[starting_field].attacking_fields.include?(@board[target_field].position)
-        puts "to boink"
+      # elsif @board[target_field].symbol != '*' && @board[starting_field].symbol != '*' && !@board[starting_field].attacking_fields.include?(@board[target_field].position)
+      #   puts "invalid move, field occupied"
+      # elsif @board[target_field].symbol != '*' && @board[starting_field].symbol != '*' && @board[starting_field].attacking_fields.include?(@board[target_field].position)
+      #   puts "to boink"
     end
   end
 
@@ -699,8 +405,6 @@ end
 
 # chessboard = Board.new
 # chessboard.move_piece("b2", "b3")
-# p chessboard.board["b3"]
-# p chessboard.board["b2"]
 # chessboard.move_piece("f7", "f5")
 # chessboard.move_piece("g8", "f6")
 # chessboard.move_piece("f6", "d7")

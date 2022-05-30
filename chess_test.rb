@@ -1,6 +1,60 @@
 require 'minitest/autorun'
 require_relative 'chess'
-class ChessTest < Minitest::Test
+
+class BoardTest < Minitest::Test
+  def test_a_piece_that_moved_is_still_the_same_piece
+    # skip
+    chessboard = Board.new
+    # p chessboard.board["b2"]
+    pawn = chessboard.board["b2"]
+    chessboard.move_piece("b2","b3")
+    assert_equal pawn, chessboard.board["b3"]
+  end
+
+  def test_there_is_no_afterimage_after_the_piece_moves
+    # skip
+    chessboard = Board.new
+    chessboard.move_piece("b2","b3")
+    assert_equal "*", chessboard.board["b2"].symbol
+  end
+
+  def test_a_piece_of_same_colour_cannot_capture_its_brethren
+    # skip
+    chessboard = Board.new
+    assert_raises(InvalidMoveError) do
+      chessboard.move_piece("b1","d2")
+    end
+  end
+
+  def test_knight_can_hop_over_other_pieces
+    skip
+    chessboard = Board.new
+    chessboard.move_piece("b2","c3")
+    assert_equal "♞", chessboard.board["c3"].symbol
+  end
+
+  def test_no_nonknight_piece_can_hop_over_others_aka_collission_detection
+    skip
+    chessboard = Board.new
+    assert_raises(InvalidMoveError) do
+      chessboard.move_piece("a1","a5")
+    end
+  end
+
+  def test_an_enemy_piece_can_be_captured
+    skip
+    chessboard = Board.new
+    assassination_target = chessboard.board["a7"]
+    chessboard.move_piece("b1", "c3")
+    chessboard.move_piece("c3", "b5")
+    chessboard.move_piece("b5", "a7")
+    refute chessboard.board["a7"], assassination_target
+  end
+
+
+end
+
+class ChessPieceTest < Minitest::Test
 
   def test_pawns_starting_position_is_valid
     assert_raises(ArgumentError) do
@@ -174,3 +228,4 @@ class ChessTest < Minitest::Test
     end
   end
 end
+
